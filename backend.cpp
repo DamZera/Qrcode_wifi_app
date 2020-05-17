@@ -49,8 +49,7 @@ QString BackEnd::sourceImage()
 
 void BackEnd::clickOnGenerate()
 {
-     qWifi(4, (const char*) m_ssid.toLocal8Bit().data(), "WPA", (const char*) m_password.toLocal8Bit().data());
-     //m_sourceImage = "file:./result.bmp";
+     qWifi(8, (const char*) m_ssid.toLocal8Bit().data(), "WPA", (const char*) m_password.toLocal8Bit().data());
      emit sourceImageChanged();
 }
 
@@ -63,12 +62,16 @@ void BackEnd::qWifi(int mfactor, const char* ssid, const char* security, const c
   int size = qr0.getSize();
   bool* img_matrix = new bool[size*size*multiplier*multiplier];
   std::fill_n(img_matrix, size*size*multiplier*multiplier, 0);
-  for(int j=0; j<size; j++){
-    for(int i=0; i<size; i++){
+  for(int j=0; j<size; j++)
+  {
+    for(int i=0; i<size; i++)
+    {
       if (!qr0.getModule(i, j))
       {
-        for(int x=0; x<multiplier; x++){
-          for(int y=0; y<multiplier; y++){
+        for(int x=0; x<multiplier; x++)
+        {
+          for(int y=0; y<multiplier; y++)
+          {
             img_matrix[(i*multiplier+x)+((j*multiplier+y)*size*multiplier)] = 1;
           }
         }
@@ -101,7 +104,8 @@ void BackEnd::write_bitmap(const std::string path, const int width, const int he
     int pad=(4-(3*width)%4)%4, filesize=54+(3*width+pad)*height; // horizontal line must be a multiple of 4 bytes long, header is 54 bytes
     char header[54] = { 'B','M', 0,0,0,0, 0,0,0,0, 54,0,0,0, 40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,24,0 };
     char padding[3] = { 0,0,0 };
-    for(int i=0; i<4; i++) {
+    for(int i=0; i<4; i++)
+    {
         header[ 2+i] = (char)((filesize>>(8*i))&255);
         header[18+i] = (char)((width   >>(8*i))&255);
         header[22+i] = (char)((height  >>(8*i))&255);
@@ -110,15 +114,17 @@ void BackEnd::write_bitmap(const std::string path, const int width, const int he
     std::ofstream file(path, std::ios::out|std::ios::binary);
     file.write(header, 54);
     unsigned char* img_line = new unsigned char[3*width];
-    for (int i=height-1; i>=0; i--) {
+    for (int i=height-1; i>=0; i--)
+    {
         std::fill_n(img_line, 3*width, 0x00);
-        for (int j=0; j<width; j++) {
+        for (int j=0; j<width; j++)
+        {
           if (data[i+j*width])
-                {
+          {
             img_line[3*j  ] = (unsigned char)255;
             img_line[3*j+1] = (unsigned char)255;
             img_line[3*j+2] = (unsigned char)255;
-                }
+          }
         }
         file.write((char*)(img_line), 3*width);
         file.write(padding, pad);
